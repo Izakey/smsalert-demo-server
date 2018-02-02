@@ -55,6 +55,7 @@ import io.mifos.provisioner.api.v1.domain.*;
 import io.mifos.reporting.api.v1.client.ReportManager;
 import io.mifos.rhythm.api.v1.client.RhythmManager;
 import io.mifos.rhythm.api.v1.events.BeatEvent;
+import io.mifos.smsalert.api.v1.client.SmsalertManager;
 import io.mifos.teller.api.v1.client.TellerManager;
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -106,6 +107,7 @@ public class ServiceRunner {
   private static Microservice<ReportManager> reportManager;
   private static Microservice<ChequeManager> chequeManager;
   private static Microservice<PayrollManager> payrollManager;
+  private static Microservice<SmsalertManager> smsalertManager;
 
 
   private static DB embeddedMariaDb;
@@ -231,10 +233,14 @@ public class ServiceRunner {
 
     ServiceRunner.payrollManager = new Microservice<>(PayrollManager.class, "payroll", "0.1.0-BUILD-SNAPSHOT", ServiceRunner.INTEGRATION_TEST_ENVIRONMENT);
     startService(generalProperties, ServiceRunner.payrollManager);
+
+    ServiceRunner.smsalertManager = new Microservice<>(SmsalertManager.class, "smsalert", "0.1.0.BUILD-SNAPSHOT", ServiceRunner.INTEGRATION_TEST_ENVIRONMENT);
+    startService(generalProperties, ServiceRunner.smsalertManager);
   }
 
   @After
   public void tearDown() throws Exception {
+    ServiceRunner.smsalertManager.kill();
     ServiceRunner.payrollManager.kill();
     ServiceRunner.chequeManager.kill();
     ServiceRunner.reportManager.kill();
@@ -276,6 +282,7 @@ public class ServiceRunner {
     System.out.println("Reporting Service: " + ServiceRunner.reportManager.getProcessEnvironment().serverURI());
     System.out.println("Cheque Service: " + ServiceRunner.chequeManager.getProcessEnvironment().serverURI());
     System.out.println("Payroll Service: " + ServiceRunner.payrollManager.getProcessEnvironment().serverURI());
+    System.out.println("Smsalert Service: " + ServiceRunner.smsalertManager.getProcessEnvironment().serverURI());
 
     boolean run = true;
 
@@ -338,7 +345,9 @@ public class ServiceRunner {
             ApplicationBuilder.create(ServiceRunner.tellerManager.name(), ServiceRunner.tellerManager.uri()),
             ApplicationBuilder.create(ServiceRunner.reportManager.name(), ServiceRunner.reportManager.uri()),
             ApplicationBuilder.create(ServiceRunner.chequeManager.name(), ServiceRunner.chequeManager.uri()),
-            ApplicationBuilder.create(ServiceRunner.payrollManager.name(), ServiceRunner.payrollManager.uri())
+            ApplicationBuilder.create(ServiceRunner.payrollManager.name(), ServiceRunner.payrollManager.uri()),
+            ApplicationBuilder.create(ServiceRunner.smsalertManager.name(), ServiceRunner.smsalertManager.uri())
+
     );
 
     final List<Tenant> tenantsToCreate = Arrays.asList(
@@ -440,6 +449,8 @@ public class ServiceRunner {
       provisionApp(tenant, ServiceRunner.chequeManager, io.mifos.cheque.api.v1.EventConstants.INITIALIZE);
 
       provisionApp(tenant, ServiceRunner.payrollManager, io.mifos.payroll.api.v1.EventConstants.INITIALIZE);
+
+      provisionApp(tenant, ServiceRunner.smsalertManager, io.mifos.smsalert.api.v1.events.SmsalertEventConstants.INITIALIZE);
 
       final UserWithPassword orgAdminUserPassword = createOrgAdminRoleAndUser(tenantAdminPassword.getAdminPassword());
 
