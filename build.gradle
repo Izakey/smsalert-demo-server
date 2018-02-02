@@ -2,7 +2,6 @@ buildscript {
 
     repositories {
         jcenter()
-        mavenLocal()
     }
 
     dependencies {
@@ -35,7 +34,6 @@ ext.versions = [
         mifosreporting          : '0.1.0-BUILD-SNAPSHOT',
         kuelapcheques           : '0.1.0-BUILD-SNAPSHOT',
         mifospayroll            : '0.1.0-BUILD-SNAPSHOT',
-        mifossmsalert           : '0.1.0.BUILD-SNAPSHOT',
         frameworkapi            : '0.1.0-BUILD-SNAPSHOT',
         frameworklang           : '0.1.0-BUILD-SNAPSHOT',
         frameworktest           : '0.1.0-BUILD-SNAPSHOT',
@@ -92,7 +90,6 @@ dependencies {
             [group: 'io.mifos.reporting', name: 'api', version: versions.mifosreporting],
             [group: 'io.mifos.cheques', name: 'api', version: versions.kuelapcheques],
             [group: 'io.mifos.payroll', name: 'api', version: versions.mifospayroll],
-            [group: 'io.mifos.smsalert', name: 'api', version: versions.mifossmsalert],
 
             [group: 'io.mifos.anubis', name: 'api', version: versions.frameworkanubis],
             [group: 'io.mifos.anubis', name: 'test', version: versions.frameworkanubis],
